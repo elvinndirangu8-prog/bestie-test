@@ -3,32 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Do u know me?? 🤔🏎️</title>
+    <title>Elite Racer: Global Telemetry 🏎️</title>
+    
+    <!-- FIXED SCRIPTS: These must be exactly like this to work -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
     <script src="https://jsdelivr.net"></script>
     <link href="https://googleapis.com" rel="stylesheet">
+    
     <style>
         :root { --accent: #00f2ff; --danger: #ff0055; --glass: rgba(10, 10, 12, 0.95); --border: rgba(255, 255, 255, 0.1); }
         body { font-family: 'Inter', sans-serif; background: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); }
         .bg-line { position: absolute; width: 2px; height: 100px; background: linear-gradient(to bottom, transparent, var(--accent), transparent); opacity: 0.2; animation: moveLine 4s linear infinite; }
         @keyframes moveLine { from { top: -100px; } to { top: 110vh; } }
-        .app-container { width: 90%; max-width: 440px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 4px; padding: 40px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8); z-index: 10; }
+        .app-container { width: 90%; max-width: 440px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 4px; padding: 40px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8); z-index: 10; text-align: center; }
         h1 { font-family: 'Syncopate', sans-serif; font-size: 0.9rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 30px; }
-        input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); padding: 10px 0; color: #fff; font-size: 1rem; font-family: 'Syncopate', sans-serif; outline: none; transition: 0.3s; margin-bottom: 20px; }
-        input:focus { border-color: var(--accent); }
-        .btn-grid { display: grid; gap: 12px; margin-top: 20px; }
-        .racer-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #ccc; padding: 18px; cursor: pointer; text-align: left; font-size: 0.85rem; text-transform: uppercase; transition: all 0.2s; position: relative; }
-        .racer-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: var(--accent); }
+        input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); padding: 10px 0; color: #fff; font-size: 1rem; font-family: 'Syncopate', sans-serif; outline: none; margin-bottom: 20px; }
+        .racer-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #ccc; padding: 18px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin: 10px 0; }
+        .racer-btn:hover { border-color: var(--accent); color: #fff; }
         .btn-correct { background: rgba(0, 242, 255, 0.2) !important; border-color: var(--accent) !important; }
         .btn-wrong { background: rgba(255, 0, 85, 0.2) !important; border-color: var(--danger) !important; }
-        .gauge { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--accent); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        .entry { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 8px 0; font-size: 0.8rem; text-align: left; }
     </style>
 </head>
 <body>
     <div class="app-container" id="app"></div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6XwPIyCsapTe0kjdSvAepZ3ev1dK-DoI",
+            authDomain: "bestie-quiz-a2daf.firebaseapp.com",
+            databaseURL: "https://bestie-quiz-a2daf-default-rtdb.firebaseio.com",
+            projectId: "bestie-quiz-a2daf",
+            storageBucket: "bestie-quiz-a2daf.firebasestorage.app",
+            messagingSenderId: "1033751201605",
+            appId: "1:1033751201605:web:60d25d24bdcd1d40c0a02c",
+            measurementId: "G-2YDL8220M9"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const CONFIG = {
             questions: [
                 { q: "Favorite food? 🍕", a: ["Pizza", "Burgers", "Sushi", "Shawarma"], c: 3 },
@@ -55,42 +71,60 @@
         };
 
         const STATE = { playerName: "", currentIdx: 0, score: 0, isProcessing: false };
+        const app = document.getElementById('app');
 
-        const VIEW = {
-            app: document.getElementById('app'),
-            init() { this.renderNameScreen(); this.createLines(); },
-            createLines() { for(let i=0; i<12; i++) { let l = document.createElement('div'); l.className = 'bg-line'; l.style.left = Math.random() * 100 + "vw"; l.style.animationDelay = Math.random() * 4 + "s"; document.body.appendChild(l); } },
-            renderNameScreen() {
-                this.app.innerHTML = `<div class="fade-in"><h1>Do u know me?? 🤔</h1><p style="font-size:0.8rem; color:#888;">INITIALIZING SYSTEM...</p><input type="text" id="p-name" placeholder="ENTER RACER NAME..." autocomplete="off"><button class="racer-btn" onclick="CONTROLLER.start()">START ENGINE 🚀</button></div>`;
-            },
-            renderQuestion() {
-                const data = CONFIG.questions[STATE.currentIdx];
-                let btns = data.a.map((opt, i) => `<button class="racer-btn" onclick="CONTROLLER.hit(this, ${i})">${opt}</button>`).join('');
-                this.app.innerHTML = `<div class="fade-in"><h1>TELEMETRY ${STATE.currentIdx + 1}/20</h1><p style="margin:20px 0;">${data.q}</p><div class="btn-grid">${btns}</div></div>`;
-            },
-            renderResults() {
-                this.app.innerHTML = `<div class="fade-in"><h1>SYSTEM REPORT</h1><div class="gauge"><span style="font-size:2rem; font-family:'Syncopate';">${STATE.score}</span></div><p>SCORE CAPTURED</p><div id="lb" style="margin-top:20px; text-align:left;"></div></div>`;
-                this.handleLB();
-            },
-            handleLB() {
-                let lb = JSON.parse(localStorage.getItem('racer_scores') || '[]');
-                lb.push({ n: STATE.playerName, s: STATE.score });
-                lb.sort((a,b) => b.s - a.s);
-                localStorage.setItem('racer_scores', JSON.stringify(lb.slice(0,5)));
-                document.getElementById('lb').innerHTML = `<p style="color:var(--accent); font-size:0.7rem;">LEADERBOARD</p>` + lb.slice(0,5).map(e => `<div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:5px 0; border-bottom:1px solid #222;"><span>${e.n}</span><span>${e.s} PTS</span></div>`).join('');
-            }
-        };
+        if (localStorage.getItem("quiz_locked")) {
+            showFinalLeaderboard();
+        } else {
+            renderNameScreen();
+        }
 
-        const CONTROLLER = {
-            start() { const n = document.getElementById('p-name').value; if(!n.trim()) return; STATE.playerName = n.toUpperCase(); VIEW.renderQuestion(); },
-            hit(btn, idx) {
-                if(STATE.isProcessing) return; STATE.isProcessing = true;
-                const correct = CONFIG.questions[STATE.currentIdx].c;
-                if(idx === correct) { STATE.score++; btn.classList.add('btn-correct'); } else { btn.classList.add('btn-wrong'); }
-                setTimeout(() => { STATE.currentIdx++; if(STATE.currentIdx < 20) VIEW.renderQuestion(); else { VIEW.renderResults(); if(STATE.score >= 15) confetti({ particleCount: 200 }); } STATE.isProcessing = false; }, 600);
-            }
-        };
-        VIEW.init();
+        function renderNameScreen() {
+            app.innerHTML = `<h1>Do u know me?? 🤔</h1><input type="text" id="p-name" placeholder="ENTER NAME..."><button class="racer-btn" onclick="start()">START 🚀</button>`;
+        }
+
+        function start() {
+            const n = document.getElementById('p-name').value;
+            if(!n.trim()) return;
+            STATE.playerName = n.toUpperCase();
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const data = CONFIG.questions[STATE.currentIdx];
+            let btns = data.a.map((opt, i) => `<button class="racer-btn" onclick="hit(this, ${i})">${opt}</button>`).join('');
+            app.innerHTML = `<h1>SYSTEM ${STATE.currentIdx + 1}/20</h1><p>${data.q}</p><div class="btn-grid">${btns}</div>`;
+        }
+
+        function hit(btn, idx) {
+            if(STATE.isProcessing) return; STATE.isProcessing = true;
+            const correct = CONFIG.questions[STATE.currentIdx].c;
+            if(idx === correct) { STATE.score++; btn.classList.add('btn-correct'); } else { btn.classList.add('btn-wrong'); }
+            setTimeout(() => {
+                STATE.currentIdx++;
+                if(STATE.currentIdx < 20) renderQuestion();
+                else finalize();
+                STATE.isProcessing = false;
+            }, 600);
+        }
+
+        function finalize() {
+            localStorage.setItem("quiz_locked", "true");
+            db.ref('scores').push({ name: STATE.playerName, score: STATE.score });
+            showFinalLeaderboard();
+        }
+
+        function showFinalLeaderboard() {
+            app.innerHTML = `<h1>TELEMETRY REPORT</h1><div id="global-lb">Loading Standings...</div>`;
+            db.ref('scores').orderByChild('score').limitToLast(10).on('value', (snap) => {
+                let list = [];
+                snap.forEach(c => { list.push(c.val()); });
+                list.reverse();
+                document.getElementById('global-lb').innerHTML = `<h3>GLOBAL TOP 10</h3>` + 
+                list.map((e, i) => `<div class="entry"><span>${i+1}. ${e.name}</span><span>${e.score} PTS</span></div>`).join('');
+            });
+            if(STATE.score >= 15) confetti();
+        }
     </script>
 </body>
 </html>
