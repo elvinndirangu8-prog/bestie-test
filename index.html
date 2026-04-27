@@ -6,13 +6,13 @@
     <link rel="icon" type="image/png" href="https://flaticon.com">
     <title> Bestie Test 🏎️</title>
 
+    <!-- LOAD CONFETTI FIRST -->
     <script src="https://jsdelivr.net"></script>
     
     <style>
         body { 
             font-family: 'Poppins', sans-serif; 
-            /* CAR THEMED BACKGROUND */
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
                         url('https://unsplash.com');
             background-size: cover;
             background-position: center;
@@ -22,11 +22,11 @@
             color: #fff;
         }
         .quiz-container { 
-            background: rgba(20, 20, 20, 0.9); /* Dark carbon feel */
+            background: rgba(15, 15, 15, 0.95); 
             padding: 30px; border-radius: 20px; 
-            box-shadow: 0 0 20px rgba(35, 166, 213, 0.5); 
+            box-shadow: 0 0 25px rgba(35, 166, 213, 0.6); 
             width: 100%; max-width: 450px; text-align: center; 
-            border: 1px solid #333;
+            border: 1px solid #444;
         }
         .progress-container { width: 100%; background: #333; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; display: none; }
         #progress-bar { height: 100%; width: 0%; background: #23a6d5; transition: 0.3s; }
@@ -35,12 +35,11 @@
         button { 
             background: #23a6d5; color: white; border: none; padding: 14px; border-radius: 8px; 
             cursor: pointer; margin: 8px 0; width: 100%; font-weight: bold; font-size: 1em; transition: 0.2s;
-            text-transform: uppercase; letter-spacing: 1px;
+            text-transform: uppercase;
         }
-        button:hover { background: #1e8cb4; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        h1 { color: #23a6d5; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        button:hover { background: #1e8cb4; transform: translateY(-2px); }
+        h1 { color: #23a6d5; margin-bottom: 10px; }
         #result { font-size: 1.5em; font-weight: 600; color: #2ecc71; }
-        p { font-size: 1.1em; }
     </style>
 </head>
 <body>
@@ -81,19 +80,21 @@
 
     <div id="result" class="hidden">
         <p>Score: <span id="score-val">0</span> / 20</p>
-        <div id="message" style="margin-bottom: 20px;"></div>
-        <button onclick="location.reload()" style="background:#ff4757;">Refuel & Restart 🔄</button>
+        <div id="message"></div>
+        <button onclick="location.reload()" style="background:#ff4757; margin-top: 20px;">Refuel & Restart 🔄</button>
     </div>
 </div>
 
 <script>
     let currentStep = 0, score = 0;
     const qs = document.querySelectorAll('.question');
+
     function startQuiz() {
         document.getElementById('intro-screen').classList.add('hidden');
         document.getElementById('quiz-box').classList.remove('hidden');
         document.getElementById('p-container').style.display = 'block';
     }
+
     function checkAnswer(choice) {
         if (choice === qs[currentStep].getAttribute('data-answer')) score++;
         qs[currentStep].classList.replace('active', 'hidden');
@@ -112,10 +113,33 @@
         let msg = document.getElementById('message');
         
         if (score >= 15) {
-            msg.innerHTML = "<p>You're a real one! 🏆</p>";
-            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+            msg.innerHTML = "<p style='color:#2ecc71'>You're a real one! 🏆</p>";
+            // FIRE CONFETTI REPEATEDLY FOR 2 SECONDS
+            var duration = 2 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+              confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#23a6d5', '#ffffff']
+              });
+              confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#23a6d5', '#ffffff']
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
         } else {
-            msg.innerHTML = "<p>Do u even know me? 💀</p>";
+            msg.innerHTML = "<p style='color:#ff4757'>Do u even know me? 💀</p>";
         }
     }
 </script>
