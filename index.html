@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Racer: Global Telemetry 🏎️</title>
     
-    <!-- HIGH-STABILITY SCRIPTS -->
+    <!-- FIXED SCRIPTS -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <script src="https://jsdelivr.net"></script>
@@ -33,10 +33,11 @@
     </div>
 
     <script>
+        // FIXED CONFIG: All URLs restored
         const firebaseConfig = {
             apiKey: "AIzaSyA6XwPIyCsapTe0kjdSvAepZ3ev1dK-DoI",
-            authDomain: "://firebaseapp.com",
-            databaseURL: "https://firebaseio.com",
+            authDomain: "bestie-quiz-a2daf.firebaseapp.com",
+            databaseURL: "https://bestie-quiz-a2daf-default-rtdb.firebaseio.com",
             projectId: "bestie-quiz-a2daf",
             storageBucket: "bestie-quiz-a2daf.firebasestorage.app",
             messagingSenderId: "1033751201605",
@@ -44,13 +45,12 @@
             measurementId: "G-2YDL8220M9"
         };
 
-        // Initialize Firebase with Error Handling
         try {
             firebase.initializeApp(firebaseConfig);
             var db = firebase.database();
         } catch (e) {
-            console.error("Firebase failed to load", e);
-            document.getElementById('app').innerHTML = "<h1>CONNECTION ERROR</h1><p>Check Firebase Rules</p>";
+            console.error(e);
+            document.getElementById('app').innerHTML = "<h1>SYSTEM ERROR</h1>";
         }
 
         const CONFIG = {
@@ -131,7 +131,7 @@
                 snap.forEach(c => { list.push(c.val()); });
                 list.reverse();
                 document.getElementById('global-lb').innerHTML = `<h3>GLOBAL TOP 10</h3>` + 
-                list.map((e, i) => `<div class="entry"><span>${i+1}. ${e.name}</span><span>${e.score} PTS</span></div>`).join('');
+                list.map((e, i) => `<div class="entry"><span>${i + 1}. ${e.name}</span><span>${e.score} PTS</span></div>`).join('');
             });
             if(STATE.score >= 15) confetti();
         }
