@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Racer: Global Telemetry 🏎️</title>
     
-    <!-- FIXED SCRIPTS: These must be exactly like this to work -->
+    <!-- BULLETPROOF SCRIPTS -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <script src="https://jsdelivr.net"></script>
@@ -16,7 +16,7 @@
         body { font-family: 'Inter', sans-serif; background: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); }
         .bg-line { position: absolute; width: 2px; height: 100px; background: linear-gradient(to bottom, transparent, var(--accent), transparent); opacity: 0.2; animation: moveLine 4s linear infinite; }
         @keyframes moveLine { from { top: -100px; } to { top: 110vh; } }
-        .app-container { width: 90%; max-width: 440px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 4px; padding: 40px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8); z-index: 10; text-align: center; }
+        .app-container { width: 90%; max-width: 440px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 4px; padding: 40px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8); z-index: 10; text-align: center; min-height: 200px; }
         h1 { font-family: 'Syncopate', sans-serif; font-size: 0.9rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 30px; }
         input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); padding: 10px 0; color: #fff; font-size: 1rem; font-family: 'Syncopate', sans-serif; outline: none; margin-bottom: 20px; }
         .racer-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #ccc; padding: 18px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin: 10px 0; }
@@ -28,13 +28,15 @@
     </style>
 </head>
 <body>
-    <div class="app-container" id="app"></div>
+    <div class="app-container" id="app">
+        <h1>SYSTEM LOADING...</h1>
+    </div>
 
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyA6XwPIyCsapTe0kjdSvAepZ3ev1dK-DoI",
-            authDomain: "bestie-quiz-a2daf.firebaseapp.com",
-            databaseURL: "https://bestie-quiz-a2daf-default-rtdb.firebaseio.com",
+            authDomain: "://firebaseapp.com",
+            databaseURL: "https://firebaseio.com",
             projectId: "bestie-quiz-a2daf",
             storageBucket: "bestie-quiz-a2daf.firebasestorage.app",
             messagingSenderId: "1033751201605",
@@ -42,6 +44,7 @@
             measurementId: "G-2YDL8220M9"
         };
 
+        // INITIALIZE
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -73,10 +76,12 @@
         const STATE = { playerName: "", currentIdx: 0, score: 0, isProcessing: false };
         const app = document.getElementById('app');
 
-        if (localStorage.getItem("quiz_locked")) {
-            showFinalLeaderboard();
-        } else {
-            renderNameScreen();
+        function init() {
+            if (localStorage.getItem("quiz_locked")) {
+                showFinalLeaderboard();
+            } else {
+                renderNameScreen();
+            }
         }
 
         function renderNameScreen() {
@@ -125,6 +130,9 @@
             });
             if(STATE.score >= 15) confetti();
         }
+
+        // START SYSTEM
+        init();
     </script>
 </body>
 </html>
