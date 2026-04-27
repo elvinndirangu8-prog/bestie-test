@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Racer: Global Telemetry 🏎️</title>
     
-    <!-- FIXED SCRIPTS: These must be exactly like this to load the system -->
+    <!-- FULLY WORKING SCRIPTS -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <script src="https://jsdelivr.net"></script>
@@ -19,18 +19,16 @@
         .app-container { width: 90%; max-width: 440px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 4px; padding: 40px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8); z-index: 10; text-align: center; }
         h1 { font-family: 'Syncopate', sans-serif; font-size: 0.9rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 30px; }
         input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); padding: 10px 0; color: #fff; font-size: 1rem; font-family: 'Syncopate', sans-serif; outline: none; margin-bottom: 20px; }
-        .racer-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #ccc; padding: 18px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin: 10px 0; }
-        .racer-btn:hover { border-color: var(--accent); color: #fff; }
+        .racer-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #ccc; padding: 18px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin: 10px 0; border-radius: 8px; }
+        .racer-btn:hover { border-color: var(--accent); color: #fff; background: rgba(0, 242, 255, 0.1); }
         .btn-correct { background: rgba(0, 242, 255, 0.2) !important; border-color: var(--accent) !important; }
         .btn-wrong { background: rgba(255, 0, 85, 0.2) !important; border-color: var(--danger) !important; }
-        .hidden { display: none !important; }
+        .gauge { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--accent); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--accent); }
         .entry { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 8px 0; font-size: 0.8rem; text-align: left; }
     </style>
 </head>
 <body>
-    <div class="app-container" id="app">
-        <h1>INITIALIZING...</h1>
-    </div>
+    <div class="app-container" id="app"><h1>INITIALIZING...</h1></div>
 
     <script>
         const firebaseConfig = {
@@ -44,13 +42,8 @@
             measurementId: "G-2YDL8220M9"
         };
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            var db = firebase.database();
-        } catch (e) {
-            console.error(e);
-            document.getElementById('app').innerHTML = "<h1>SYSTEM ERROR</h1>";
-        }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         const CONFIG = {
             questions: [
@@ -86,10 +79,15 @@
             } else {
                 renderNameScreen();
             }
+            for(let i=0; i<10; i++){
+                let l = document.createElement('div'); l.className = 'bg-line';
+                l.style.left = Math.random() * 100 + "vw"; l.style.animationDelay = Math.random() * 4 + "s";
+                document.body.appendChild(l);
+            }
         }
 
         function renderNameScreen() {
-            app.innerHTML = `<h1>Do u know me?? 🤔</h1><input type="text" id="p-name" placeholder="ENTER NAME..."><button class="racer-btn" onclick="start()">START 🚀</button>`;
+            app.innerHTML = `<h1>Do u know me?? 🤔</h1><input type="text" id="p-name" placeholder="ENTER RACER NAME..."><button class="racer-btn" onclick="start()">START ENGINE 🚀</button>`;
         }
 
         function start() {
@@ -119,19 +117,22 @@
 
         function finalize() {
             localStorage.setItem("quiz_locked", "true");
-            // Upload to Firebase
-            db.ref('scores').push({ name: STATE.playerName, score: STATE.score }); 
+            db.ref('scores').push({ name: STATE.playerName, score: STATE.score });
             showFinalLeaderboard();
         }
 
         function showFinalLeaderboard() {
-            app.innerHTML = `<h1>TELEMETRY REPORT</h1><div id="global-lb">Loading Standings...</div>`;
+            app.innerHTML = `<h1>TELEMETRY REPORT</h1>
+                             <div class="gauge"><span style="font-size:2rem; font-family:'Syncopate';">${STATE.score}</span></div>
+                             <div id="global-lb">Loading Standings...</div>`;
+            
             db.ref('scores').orderByChild('score').limitToLast(10).on('value', (snap) => {
                 let list = [];
                 snap.forEach(c => { list.push(c.val()); });
                 list.reverse();
-                document.getElementById('global-lb').innerHTML = `<h3>GLOBAL TOP 10</h3>` + 
-                list.map((e, i) => `<div class="entry"><span>${i + 1}. ${e.name}</span><span>${e.score} PTS</span></div>`).join('');
+                const lb = document.getElementById('global-lb');
+                lb.innerHTML = `<h3>GLOBAL TOP 10</h3>` + 
+                list.map((e, i) => `<div class="entry"><span>${i+1}. ${e.name}</span><span>${e.score} PTS</span></div>`).join('');
             });
             if(STATE.score >= 15) confetti();
         }
