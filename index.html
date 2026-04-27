@@ -3,145 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="https://flaticon.com">
-    <title>Bestie Test 🏎️</title>
-
+    <title>Bestie Test: Leaderboard Edition 🏎️</title>
     <script src="https://jsdelivr.net"></script>
-    
     <style>
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: radial-gradient(circle, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.9) 100%), 
+            background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.9) 100%), 
                         url('https://unsplash.com');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; margin: 0; padding: 20px;
-            color: #fff;
-            overflow: hidden;
-        }
-
-        /* FLOATING EMOJIS BACKGROUND */
-        .bg-emoji {
-            position: absolute; font-size: 1.5rem;
-            animation: float 10s linear infinite;
-            z-index: 1; opacity: 0.6;
-        }
-        @keyframes float {
-            0% { transform: translateY(110vh) rotate(0deg); }
-            100% { transform: translateY(-10vh) rotate(360deg); }
+            background-size: cover; background-position: center; background-attachment: fixed;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #fff; overflow-x: hidden;
         }
 
         .quiz-container { 
-            background: rgba(15, 15, 15, 0.95); 
-            padding: 40px; border-radius: 30px; 
-            box-shadow: 0 0 40px rgba(35, 166, 213, 0.4); 
-            width: 100%; max-width: 450px; text-align: center; 
-            border: 1px solid #444;
-            position: relative; z-index: 10;
-            transition: transform 0.3s;
+            background: rgba(15, 15, 15, 0.95); padding: 30px; border-radius: 20px; 
+            box-shadow: 0 0 30px rgba(35, 166, 213, 0.5); width: 90%; max-width: 400px; text-align: center; border: 1px solid #444;
         }
 
-        /* SHAKING BOX ANIMATION */
-        .question-box { animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        input {
+            width: 80%; padding: 12px; margin: 15px 0; border-radius: 8px; border: none; font-size: 1em; text-align: center;
+        }
+
+        .leaderboard {
+            margin-top: 20px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: left;
+        }
+
+        .leaderboard-entry {
+            display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding: 5px 0;
+        }
+
+        .circle-wrap {
+            margin: 20px auto; width: 120px; height: 120px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; border: 8px solid #23a6d5;
+        }
 
         button { 
-            background: #23a6d5; color: white; border: none; padding: 16px; border-radius: 12px; 
-            cursor: pointer; margin: 10px 0; width: 100%; font-weight: bold; font-size: 1.1em; 
-            transition: all 0.3s; text-transform: uppercase;
+            background: #23a6d5; color: white; border: none; padding: 14px; border-radius: 10px; 
+            cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; margin-top: 10px;
         }
-        button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(35, 166, 213, 0.4); }
-        button.correct { background: #2ecc71 !important; }
-        button.wrong { background: #ff4757 !important; animation: shake 0.3s; }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        /* CIRCULAR SCORE LOADER */
-        .circle-wrap {
-            margin: 20px auto; width: 150px; height: 150px;
-            background: #333; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; border: 8px solid #23a6d5;
-        }
-        #score-val { font-size: 2.5em; font-weight: 900; color: #23a6d5; }
 
         .hidden { display: none !important; }
-        .active { display: block; }
+        .bg-emoji { position: absolute; animation: float 10s linear infinite; opacity: 0.5; z-index: -1; }
+        @keyframes float { 0% { transform: translateY(110vh); } 100% { transform: translateY(-10vh); } }
     </style>
 </head>
 <body>
 
-<!-- BACKGROUND ANIMATION SCRIPT WILL ADD EMOJIS HERE -->
-
-<div class="quiz-container" id="main-container">
-    <div id="intro-screen">
-        <h1>DO U KNOW ME?? 🏎️💨</h1>
-        <p>You only get one tank of gas! No retries. ⛽</p>
-        <button onclick="startQuiz()">Ignition 🚀</button>
+<div class="quiz-container">
+    <!-- NAME INPUT SCREEN -->
+    <div id="name-screen">
+        <h1>ENTRY FORM 📝</h1>
+        <p>Enter your racer name to start:</p>
+        <input type="text" id="player-name" placeholder="Your Name..." maxlength="15">
+        <button onclick="saveName()">Start Engine 🚀</button>
     </div>
 
+    <!-- QUIZ BOX (Keep your 20 questions here) -->
     <div id="quiz-box" class="hidden">
-        <!-- ALL QUESTIONS WRAPPED IN ANIMATED DIVS -->
-        <div class="question active" data-answer="D"><p>1. Favorite food? 🍕</p><button onclick="checkAnswer(this, 'A')">Pizza 🍕</button><button onclick="checkAnswer(this, 'B')">Burgers 🍔</button><button onclick="checkAnswer(this, 'C')">Sushi 🍣</button><button onclick="checkAnswer(this, 'D')">Shawarma 🌯</button></div>
-        <!-- (Rest of your 20 questions stay the same, but add checkAnswer(this, 'X')) -->
-        <!-- ... [I've truncated the questions for space, keep your 20 here] ... -->
-        <div class="question hidden" data-answer="B"><p>20. FAV CAR 🚗</p><button onclick="checkAnswer(this, 'A')">AUDI ⚪</button><button onclick="checkAnswer(this, 'B')">BMW 🔵</button></div>
+        <div class="question active" data-answer="D"><p>1. Favorite food? 🍕</p>
+            <button onclick="checkAnswer(this, 'A')">Pizza</button>
+            <button onclick="checkAnswer(this, 'B')">Burgers</button>
+            <button onclick="checkAnswer(this, 'C')">Sushi</button>
+            <button onclick="checkAnswer(this, 'D')">Shawarma</button>
+        </div>
+        <!-- ... Add your other 19 questions here ... -->
     </div>
 
-    <div id="result" class="hidden">
-        <h2>MISSION COMPLETE 🏁</h2>
-        <div class="circle-wrap">
-            <span id="score-val">0</span>
+    <!-- RESULT & LEADERBOARD -->
+    <div id="result-screen" class="hidden">
+        <h2>FINAL RANK 🏁</h2>
+        <div class="circle-wrap"><span id="score-val" style="font-size: 2em;">0</span></div>
+        
+        <div class="leaderboard">
+            <h3 style="text-align: center; margin-top: 0;">🏆 LEADERBOARD</h3>
+            <div id="leaderboard-list"></div>
         </div>
-        <div id="message"></div>
-        <p style="font-size: 0.8em; color: #888;">Entry Locked: Retries Disabled 🔒</p>
+        <p style="font-size: 0.7em; margin-top: 15px; color: #888;">Data saved locally on this device.</p>
     </div>
 </div>
 
 <script>
-    // 1. NO REPEAT LOGIC
-    if (localStorage.getItem("quiz_done")) {
-        window.onload = () => {
-            document.body.innerHTML = "<h1 style='color:white; text-align:center; padding-top:20%;'>🚫 ONE ENTRY ONLY! <br> You've already used your gas!</h1>";
-        };
-    }
-
-    // 2. CREATE FLOATING EMOJIS
-    const emojis = ['🏎️', '🏎️💨', '😊', '🔥', '🏁', '⚡', '🚦'];
-    for (let i = 0; i < 15; i++) {
-        let e = document.createElement('div');
-        e.className = 'bg-emoji';
-        e.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-        e.style.left = Math.random() * 100 + "vw";
-        e.style.animationDuration = (Math.random() * 5 + 5) + "s";
-        e.style.animationDelay = Math.random() * 5 + "s";
-        document.body.appendChild(e);
-    }
-
-    let currentStep = 0, score = 0, isProcessing = false;
+    let playerName = "";
+    let score = 0;
+    let currentStep = 0;
     const qs = document.querySelectorAll('.question');
 
-    function startQuiz() {
-        document.getElementById('intro-screen').classList.add('hidden');
+    function saveName() {
+        const input = document.getElementById('player-name').value;
+        if (input.trim() === "") return alert("Enter a name, racer!");
+        playerName = input;
+        document.getElementById('name-screen').classList.add('hidden');
         document.getElementById('quiz-box').classList.remove('hidden');
     }
 
     function checkAnswer(btn, choice) {
-        if (isProcessing) return;
-        isProcessing = true;
         const correct = qs[currentStep].getAttribute('data-answer');
-        
         if (choice === correct) {
             score++;
-            btn.classList.add('correct');
+            btn.style.background = "#2ecc71";
         } else {
-            btn.classList.add('wrong');
+            btn.style.background = "#ff4757";
         }
 
         setTimeout(() => {
@@ -150,30 +110,44 @@
             if (currentStep < qs.length) {
                 qs[currentStep].classList.replace('hidden', 'active');
             } else { showResults(); }
-            isProcessing = false;
         }, 600);
     }
 
     function showResults() {
-        localStorage.setItem("quiz_done", "true"); // LOCK THE QUIZ
         document.getElementById('quiz-box').classList.add('hidden');
-        document.getElementById('result').classList.remove('hidden');
-        
-        // Animated Score Loader
-        let currentDisplay = 0;
-        let timer = setInterval(() => {
-            if (currentDisplay >= score) clearInterval(timer);
-            document.getElementById('score-val').innerText = currentDisplay + "/20";
-            currentDisplay++;
-        }, 50);
+        document.getElementById('result-screen').classList.remove('hidden');
+        document.getElementById('score-val').innerText = score + "/20";
 
-        if (score >= 15) {
-            confetti({ particleCount: 200, spread: 90 });
-            document.getElementById('message').innerHTML = "LEGENDARY DRIVER! 🏆";
-        } else {
-            document.getElementById('message').innerHTML = "BACK TO DRIVING SCHOOL! 💀";
-        }
+        // SAVE SCORE TO LOCAL STORAGE
+        let history = JSON.parse(localStorage.getItem('bestie_scores')) || [];
+        history.push({name: playerName, points: score});
+        history.sort((a, b) => b.points - a.points); // Sort highest first
+        localStorage.setItem('bestie_scores', JSON.stringify(history.slice(0, 5))); // Keep top 5
+
+        // DISPLAY LEADERBOARD
+        const list = document.getElementById('leaderboard-list');
+        history.slice(0, 5).forEach((entry, index) => {
+            list.innerHTML += `<div class="leaderboard-entry">
+                <span>${index + 1}. ${entry.name}</span>
+                <span>${entry.points}/20</span>
+            </div>`;
+        });
+
+        if (score >= 15) confetti({ particleCount: 150, spread: 70 });
     }
+
+    // Floating Emojis
+    setInterval(() => {
+        const e = document.createElement('div');
+        e.className = 'bg-emoji';
+        e.innerText = ['🏎️', '🏁', '🔥', '😊'][Math.floor(Math.random()*4)];
+        e.style.left = Math.random() * 100 + "vw";
+        document.body.appendChild(e);
+        setTimeout(() => e.remove(), 10000);
+    }, 1000);
 </script>
 </body>
 </html>
+
+
+
