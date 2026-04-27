@@ -4,33 +4,240 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Racer: Global Telemetry 🏎️</title>
-    
-    <!-- FULLY WORKING SCRIPTS -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-    <script src="https://jsdelivr.net"></script>
-    <link href="https://googleapis.com" rel="stylesheet">
-    
+
+    <!-- Firebase v8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
     <style>
-        :root { --accent: #00f2ff; --danger: #ff0055; --glass: rgba(10, 10, 12, 0.95); --border: rgba(255, 255, 255, 0.1); }
-        body { font-family: 'Inter', sans-serif; background: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); }
-        .bg-line { position: absolute; width: 2px; height: 100px; background: linear-gradient(to bottom, transparent, var(--accent), transparent); opacity: 0.2; animation: moveLine 4s linear infinite; }
-        @keyframes moveLine { from { top: -100px; } to { top: 110vh; } }
-        .app-container { width: 90%; max-width: 440px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 4px; padding: 40px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8); z-index: 10; text-align: center; }
-        h1 { font-family: 'Syncopate', sans-serif; font-size: 0.9rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 30px; }
-        input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); padding: 10px 0; color: #fff; font-size: 1rem; font-family: 'Syncopate', sans-serif; outline: none; margin-bottom: 20px; }
-        .racer-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #ccc; padding: 18px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin: 10px 0; border-radius: 8px; }
-        .racer-btn:hover { border-color: var(--accent); color: #fff; background: rgba(0, 242, 255, 0.1); }
-        .btn-correct { background: rgba(0, 242, 255, 0.2) !important; border-color: var(--accent) !important; }
-        .btn-wrong { background: rgba(255, 0, 85, 0.2) !important; border-color: var(--danger) !important; }
-        .gauge { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--accent); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--accent); }
-        .entry { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding: 8px 0; font-size: 0.8rem; text-align: left; }
+        :root {
+            --accent: #00eaff;
+            --accent2: #ff00f7;
+            --danger: #ff0055;
+            --glass: rgba(10, 10, 20, 0.75);
+            --border: rgba(0, 255, 255, 0.25);
+            --glow: 0 0 20px rgba(0, 255, 255, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #050510 0%, #000 100%);
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Neon fog */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                rgba(0,255,255,0.05),
+                rgba(255,0,255,0.05),
+                rgba(0,255,255,0.05)
+            );
+            animation: spin 18s linear infinite;
+            filter: blur(120px);
+            z-index: 0;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Falling neon lines */
+        .bg-line {
+            position: absolute;
+            width: 2px;
+            height: 120px;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            opacity: 0.35;
+            animation: moveLine 4s linear infinite;
+            filter: drop-shadow(0 0 6px var(--accent));
+            z-index: 1;
+        }
+
+        @keyframes moveLine {
+            from { top: -150px; }
+            to { top: 110vh; }
+        }
+
+        /* Neon particle sparks */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent2);
+            opacity: 0.8;
+            pointer-events: none;
+            animation: drift 6s linear infinite, flicker 1.2s infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -60px) scale(1.4); }
+            100% { transform: translate(-20px, 80px) scale(0.8); }
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Main container */
+        .app-container {
+            width: 90%;
+            max-width: 480px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,255,255,0.2), inset 0 0 20px rgba(0,255,255,0.1);
+            z-index: 10;
+            text-align: center;
+            animation: holoPop 0.6s ease-out;
+        }
+
+        @keyframes holoPop {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--accent);
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Syncopate', sans-serif;
+            outline: none;
+            margin-bottom: 25px;
+            text-shadow: 0 0 6px var(--accent);
+        }
+
+        .racer-btn {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            color: #ccc;
+            padding: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.2s;
+            margin: 10px 0;
+            border-radius: 10px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(0,255,255,0.15);
+        }
+
+        .racer-btn:hover {
+            border-color: var(--accent);
+            color: #fff;
+            background: rgba(0, 242, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0,255,255,0.4);
+        }
+
+        .btn-correct {
+            background: rgba(0, 255, 170, 0.25) !important;
+            border-color: #00ff9d !important;
+            box-shadow: 0 0 20px #00ff9d;
+        }
+
+        .btn-wrong {
+            background: rgba(255, 0, 85, 0.25) !important;
+            border-color: var(--danger) !important;
+            box-shadow: 0 0 20px var(--danger);
+        }
+
+        .gauge {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 4px solid var(--accent2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px var(--accent2);
+            background: rgba(255,0,255,0.1);
+        }
+
+        .entry {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 0;
+            font-size: 0.85rem;
+            text-align: left;
+            color: #e0e0e0;
+        }
+
+        #global-lb h3 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-family: 'Syncopate', sans-serif;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            color: var(--accent2);
+            text-transform: uppercase;
+        }
+
+        .btn-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 28px 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="app-container" id="app"><h1>INITIALIZING...</h1></div>
 
     <script>
+        // Firebase config (your existing project)
         const firebaseConfig = {
             apiKey: "AIzaSyA6XwPIyCsapTe0kjdSvAepZ3ev1dK-DoI",
             authDomain: "bestie-quiz-a2daf.firebaseapp.com",
@@ -73,43 +280,79 @@
         const STATE = { playerName: "", currentIdx: 0, score: 0, isProcessing: false };
         const app = document.getElementById('app');
 
+        function spawnParticles() {
+            for (let i = 0; i < 40; i++) {
+                let p = document.createElement("div");
+                p.className = "particle";
+
+                p.style.left = Math.random() * 100 + "vw";
+                p.style.top = Math.random() * 100 + "vh";
+                p.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+                p.style.animationDuration = (4 + Math.random() * 4) + "s";
+
+                document.body.appendChild(p);
+            }
+        }
+
         function init() {
+            spawnParticles();
             if (localStorage.getItem("quiz_locked")) {
                 showFinalLeaderboard();
             } else {
                 renderNameScreen();
             }
-            for(let i=0; i<10; i++){
-                let l = document.createElement('div'); l.className = 'bg-line';
-                l.style.left = Math.random() * 100 + "vw"; l.style.animationDelay = Math.random() * 4 + "s";
+            for (let i = 0; i < 10; i++) {
+                let l = document.createElement('div');
+                l.className = 'bg-line';
+                l.style.left = Math.random() * 100 + "vw";
+                l.style.animationDelay = Math.random() * 4 + "s";
                 document.body.appendChild(l);
             }
         }
 
         function renderNameScreen() {
-            app.innerHTML = `<h1>Do u know me?? 🤔</h1><input type="text" id="p-name" placeholder="ENTER RACER NAME..."><button class="racer-btn" onclick="start()">START ENGINE 🚀</button>`;
+            app.innerHTML = `
+                <h1>DO U KNOW ME?? 🤔</h1>
+                <p>ENTER YOUR RACER TAG TO BEGIN.</p>
+                <input type="text" id="p-name" placeholder="ENTER RACER NAME...">
+                <button class="racer-btn" onclick="start()">START ENGINE 🚀</button>
+            `;
         }
 
         function start() {
             const n = document.getElementById('p-name').value;
-            if(!n.trim()) return;
-            STATE.playerName = n.toUpperCase();
+            if (!n.trim()) return;
+            STATE.playerName = n; // keep exactly as typed
+            STATE.currentIdx = 0;
+            STATE.score = 0;
             renderQuestion();
         }
 
         function renderQuestion() {
             const data = CONFIG.questions[STATE.currentIdx];
-            let btns = data.a.map((opt, i) => `<button class="racer-btn" onclick="hit(this, ${i})">${opt}</button>`).join('');
-            app.innerHTML = `<h1>SYSTEM ${STATE.currentIdx + 1}/20</h1><p>${data.q}</p><div class="btn-grid">${btns}</div>`;
+            let btns = data.a.map((opt, i) =>
+                `<button class="racer-btn" onclick="hit(this, ${i})">${opt}</button>`
+            ).join('');
+            app.innerHTML = `
+                <h1>SYSTEM ${STATE.currentIdx + 1}/20</h1>
+                <p>${data.q}</p>
+                <div class="btn-grid">${btns}</div>
+            `;
         }
 
         function hit(btn, idx) {
-            if(STATE.isProcessing) return; STATE.isProcessing = true;
+            if (STATE.isProcessing) return;
+            STATE.isProcessing = true;
             const correct = CONFIG.questions[STATE.currentIdx].c;
-            if(idx === correct) { STATE.score++; btn.classList.add('btn-correct'); } else { btn.classList.add('btn-wrong'); }
+            if (idx === correct) {
+                STATE.score++;
+                btn.classList.add('btn-correct');
+            } else {
+                btn.classList.add('btn-wrong');
+            }
             setTimeout(() => {
                 STATE.currentIdx++;
-                if(STATE.currentIdx < 20) renderQuestion();
+                if (STATE.currentIdx < 20) renderQuestion();
                 else finalize();
                 STATE.isProcessing = false;
             }, 600);
@@ -122,19 +365,29 @@
         }
 
         function showFinalLeaderboard() {
-            app.innerHTML = `<h1>TELEMETRY REPORT</h1>
-                             <div class="gauge"><span style="font-size:2rem; font-family:'Syncopate';">${STATE.score}</span></div>
-                             <div id="global-lb">Loading Standings...</div>`;
-            
+            app.innerHTML = `
+                <h1>TELEMETRY REPORT</h1>
+                <div class="gauge">
+                    <span style="font-size:2rem; font-family:'Syncopate';">${STATE.score}</span>
+                </div>
+                <div id="global-lb">Loading Standings...</div>
+            `;
+
             db.ref('scores').orderByChild('score').limitToLast(10).on('value', (snap) => {
                 let list = [];
                 snap.forEach(c => { list.push(c.val()); });
                 list.reverse();
                 const lb = document.getElementById('global-lb');
-                lb.innerHTML = `<h3>GLOBAL TOP 10</h3>` + 
-                list.map((e, i) => `<div class="entry"><span>${i+1}. ${e.name}</span><span>${e.score} PTS</span></div>`).join('');
+                lb.innerHTML = `<h3>GLOBAL TOP 10</h3>` +
+                    list.map((e, i) =>
+                        `<div class="entry"><span>${i + 1}. ${e.name}</span><span>${e.score} PTS</span></div>`
+                    ).join('');
             });
-            if(STATE.score >= 15) confetti();
+
+            // Only call confetti if a library is present
+            if (STATE.score >= 15 && typeof confetti === 'function') {
+                confetti();
+            }
         }
 
         init();
