@@ -22,7 +22,6 @@
             overflow-x: hidden;
         }
 
-        /* DRIFTING CAR ANIMATION */
         .drifter {
             font-size: 2em;
             position: absolute;
@@ -50,19 +49,23 @@
         #progress-bar { height: 100%; width: 0%; background: #23a6d5; transition: 0.3s; }
         .hidden { display: none !important; }
         .active { display: block; }
+        
         button { 
             background: #23a6d5; color: white; border: none; padding: 14px; border-radius: 8px; 
             cursor: pointer; margin: 8px 0; width: 100%; font-weight: bold; font-size: 1em; transition: 0.2s;
             text-transform: uppercase;
         }
-        button:hover { background: #1e8cb4; transform: translateY(-2px); }
+
+        /* NEW: Feedback Colors */
+        button.correct { background-color: #2ecc71 !important; transform: scale(1.05); }
+        button.wrong { background-color: #ff4757 !important; transform: shake 0.2s; }
+
         h1 { color: #23a6d5; margin-bottom: 10px; }
         #result { font-size: 1.5em; font-weight: 600; color: #2ecc71; }
     </style>
 </head>
 <body>
 
-<!-- ANIMATED CARS IN THE BACKGROUND -->
 <div class="drifter">🏎️💨</div>
 
 <div class="quiz-container">
@@ -77,26 +80,26 @@
     </div>
 
     <div id="quiz-box" class="hidden">
-        <div class="question active" data-answer="D"><p>1. Favorite food? 🍕</p><button onclick="checkAnswer('A')">Pizza 🍕</button><button onclick="checkAnswer('B')">Burgers 🍔</button><button onclick="checkAnswer('C')">Sushi 🍣</button><button onclick="checkAnswer('D')">Shawarma 🌯</button></div>
-        <div class="question hidden" data-answer="B"><p>2. Dream travel? ✈️</p><button onclick="checkAnswer('A')">Beach 🏖️</button><button onclick="checkAnswer('B')">Mountains 🏔️</button><button onclick="checkAnswer('C')">City 🏙️</button><button onclick="checkAnswer('D')">Race Track 🏁</button></div>
-        <div class="question hidden" data-answer="A"><p>3. Secret talent? 🎭</p><button onclick="checkAnswer('A')">Sleeping 😴</button><button onclick="checkAnswer('B')">Singing 🎤</button><button onclick="checkAnswer('C')">Gaming 🎮</button><button onclick="checkAnswer('D')">Debts 😹💸</button></div>
-        <div class="question hidden" data-answer="A"><p>4. Fav song? 🎶</p><button onclick="checkAnswer('A')">She Goes By 🎵</button><button onclick="checkAnswer('B')">Rock Baby 🎸</button><button onclick="checkAnswer('C')">Blue 💙</button><button onclick="checkAnswer('D')">Other ❓</button></div>
-        <div class="question hidden" data-answer="B"><p>5. Am I a morning person? ☀️</p><button onclick="checkAnswer('A')">Yes 🌅</button><button onclick="checkAnswer('B')">No 😴</button></div>
-        <div class="question hidden" data-answer="B"><p>6. Cats or Dogs? 🐾</p><button onclick="checkAnswer('A')">Cats 🐱</button><button onclick="checkAnswer('B')">Dogs 🐶</button></div>
-        <div class="question hidden" data-answer="A"><p>7. Coke or Pepsi? 🥤</p><button onclick="checkAnswer('A')">Coke ❤️</button><button onclick="checkAnswer('B')">Pepsi 💙</button></div>
-        <div class="question hidden" data-answer="A"><p>8. Favorite season? 🍂</p><button onclick="checkAnswer('A')">Summer ☀️</button><button onclick="checkAnswer('B')">Winter ❄️</button></div>
-        <div class="question hidden" data-answer="A"><p>9. Where would I travel? 🌍</p><button onclick="checkAnswer('A')">Tokyo 🗼</button><button onclick="checkAnswer('B')">Switzerland 🇨🇭</button></div>
-        <div class="question hidden" data-answer="A"><p>10. Introvert or Extrovert? 👥</p><button onclick="checkAnswer('A')">Introvert 🏠</button><button onclick="checkAnswer('B')">Extrovert 🥳</button></div>
-        <div class="question hidden" data-answer="B"><p>11. Android or iPhone? 📱</p><button onclick="checkAnswer('A')">iPhone 🍎</button><button onclick="checkAnswer('B')">Android 🤖</button></div>
-        <div class="question hidden" data-answer="B"><p>12. Movie genre? 🍿</p><button onclick="checkAnswer('A')">Horror 👻</button><button onclick="checkAnswer('B')">Comedy 😂</button></div>
-        <div class="question hidden" data-answer="A"><p>13. My biggest fear? 😱</p><button onclick="checkAnswer('A')">None 😎</button><button onclick="checkAnswer('B')">Heights 🧗</button></div>
-        <div class="question hidden" data-answer="A"><p>14. Best superpower? ⚡</p><button onclick="checkAnswer('A')">Flight 🦅</button><button onclick="checkAnswer('B')">Invisibility 👻</button></div>
-        <div class="question hidden" data-answer="A"><p>15. TYPE?? 😍</p><button onclick="checkAnswer('A')">short and cute ✨</button><button onclick="checkAnswer('B')">tall and Savory 🔥</button></div>
-        <div class="question hidden" data-answer="B"><p>16. Tea or Coffee? ☕</p><button onclick="checkAnswer('A')">Coffee ☕</button><button onclick="checkAnswer('B')">Tea 🍵</button></div>
-        <div class="question hidden" data-answer="B"><p>17. Do I like dancing? 💃</p><button onclick="checkAnswer('A')">Yes 🕺</button><button onclick="checkAnswer('B')">No 🙅‍♂️</button></div>
-        <div class="question hidden" data-answer="A"><p>18. Rainy days or Sunny days? 🌧️</p><button onclick="checkAnswer('A')">Rainy ☔</button><button onclick="checkAnswer('B')">Sunny 🕶️</button></div>
-        <div class="question hidden" data-answer="A"><p>19. My birth month? 🎂</p><button onclick="checkAnswer('A')">Jan-Jun 🌱</button><button onclick="checkAnswer('B')">Jul-Dec 🍂</button></div>
-        <div class="question hidden" data-answer="B"><p>20. FAV CAR 🚗</p><button onclick="checkAnswer('A')">AUDI ⚪</button><button onclick="checkAnswer('B')">BMW 🔵</button></div>
+        <div class="question active" data-answer="D"><p>1. Favorite food? 🍕</p><button onclick="checkAnswer(this, 'A')">Pizza 🍕</button><button onclick="checkAnswer(this, 'B')">Burgers 🍔</button><button onclick="checkAnswer(this, 'C')">Sushi 🍣</button><button onclick="checkAnswer(this, 'D')">Shawarma 🌯</button></div>
+        <div class="question hidden" data-answer="B"><p>2. Dream travel? ✈️</p><button onclick="checkAnswer(this, 'A')">Beach 🏖️</button><button onclick="checkAnswer(this, 'B')">Mountains 🏔️</button><button onclick="checkAnswer(this, 'C')">City 🏙️</button><button onclick="checkAnswer(this, 'D')">Race Track 🏁</button></div>
+        <div class="question hidden" data-answer="A"><p>3. Secret talent? 🎭</p><button onclick="checkAnswer(this, 'A')">Sleeping 😴</button><button onclick="checkAnswer(this, 'B')">Singing 🎤</button><button onclick="checkAnswer(this, 'C')">Gaming 🎮</button><button onclick="checkAnswer(this, 'D')">Debts 😹💸</button></div>
+        <div class="question hidden" data-answer="A"><p>4. Fav song? 🎶</p><button onclick="checkAnswer(this, 'A')">She Goes By 🎵</button><button onclick="checkAnswer(this, 'B')">Rock Baby 🎸</button><button onclick="checkAnswer(this, 'C')">Blue 💙</button><button onclick="checkAnswer(this, 'D')">Other ❓</button></div>
+        <div class="question hidden" data-answer="B"><p>5. Am I a morning person? ☀️</p><button onclick="checkAnswer(this, 'A')">Yes 🌅</button><button onclick="checkAnswer(this, 'B')">No 😴</button></div>
+        <div class="question hidden" data-answer="B"><p>6. Cats or Dogs? 🐾</p><button onclick="checkAnswer(this, 'A')">Cats 🐱</button><button onclick="checkAnswer(this, 'B')">Dogs 🐶</button></div>
+        <div class="question hidden" data-answer="A"><p>7. Coke or Pepsi? 🥤</p><button onclick="checkAnswer(this, 'A')">Coke ❤️</button><button onclick="checkAnswer(this, 'B')">Pepsi 💙</button></div>
+        <div class="question hidden" data-answer="A"><p>8. Favorite season? 🍂</p><button onclick="checkAnswer(this, 'A')">Summer ☀️</button><button onclick="checkAnswer(this, 'B')">Winter ❄️</button></div>
+        <div class="question hidden" data-answer="A"><p>9. Where would I travel? 🌍</p><button onclick="checkAnswer(this, 'A')">Tokyo 🗼</button><button onclick="checkAnswer(this, 'B')">Switzerland 🇨🇭</button></div>
+        <div class="question hidden" data-answer="A"><p>10. Introvert or Extrovert? 👥</p><button onclick="checkAnswer(this, 'A')">Introvert 🏠</button><button onclick="checkAnswer(this, 'B')">Extrovert 🥳</button></div>
+        <div class="question hidden" data-answer="B"><p>11. Android or iPhone? 📱</p><button onclick="checkAnswer(this, 'A')">iPhone 🍎</button><button onclick="checkAnswer(this, 'B')">Android 🤖</button></div>
+        <div class="question hidden" data-answer="B"><p>12. Movie genre? 🍿</p><button onclick="checkAnswer(this, 'A')">Horror 👻</button><button onclick="checkAnswer(this, 'B')">Comedy 😂</button></div>
+        <div class="question hidden" data-answer="A"><p>13. My biggest fear? 😱</p><button onclick="checkAnswer(this, 'A')">None 😎</button><button onclick="checkAnswer(this, 'B')">Heights 🧗</button></div>
+        <div class="question hidden" data-answer="A"><p>14. Best superpower? ⚡</p><button onclick="checkAnswer(this, 'A')">Flight 🦅</button><button onclick="checkAnswer(this, 'B')">Invisibility 👻</button></div>
+        <div class="question hidden" data-answer="A"><p>15. TYPE?? 😍</p><button onclick="checkAnswer(this, 'A')">short and cute ✨</button><button onclick="checkAnswer(this, 'B')">tall and Savory 🔥</button></div>
+        <div class="question hidden" data-answer="B"><p>16. Tea or Coffee? ☕</p><button onclick="checkAnswer(this, 'A')">Coffee ☕</button><button onclick="checkAnswer(this, 'B')">Tea 🍵</button></div>
+        <div class="question hidden" data-answer="B"><p>17. Do I like dancing? 💃</p><button onclick="checkAnswer(this, 'A')">Yes 🕺</button><button onclick="checkAnswer(this, 'B')">No 🙅‍♂️</button></div>
+        <div class="question hidden" data-answer="A"><p>18. Rainy days or Sunny days? 🌧️</p><button onclick="checkAnswer(this, 'A')">Rainy ☔</button><button onclick="checkAnswer(this, 'B')">Sunny 🕶️</button></div>
+        <div class="question hidden" data-answer="A"><p>19. My birth month? 🎂</p><button onclick="checkAnswer(this, 'A')">Jan-Jun 🌱</button><button onclick="checkAnswer(this, 'B')">Jul-Dec 🍂</button></div>
+        <div class="question hidden" data-answer="B"><p>20. FAV CAR 🚗</p><button onclick="checkAnswer(this, 'A')">AUDI ⚪</button><button onclick="checkAnswer(this, 'B')">BMW 🔵</button></div>
     </div>
 
     <div id="result" class="hidden">
@@ -107,7 +110,7 @@
 </div>
 
 <script>
-    let currentStep = 0, score = 0;
+    let currentStep = 0, score = 0, isProcessing = false;
     const qs = document.querySelectorAll('.question');
 
     function startQuiz() {
@@ -116,14 +119,33 @@
         document.getElementById('p-container').style.display = 'block';
     }
 
-    function checkAnswer(choice) {
-        if (choice === qs[currentStep].getAttribute('data-answer')) score++;
-        qs[currentStep].classList.replace('active', 'hidden');
-        currentStep++;
-        document.getElementById('progress-bar').style.width = (currentStep / qs.length * 100) + '%';
-        if (currentStep < qs.length) {
-            qs[currentStep].classList.replace('hidden', 'active');
-        } else { showResults(); }
+    function checkAnswer(btn, choice) {
+        if (isProcessing) return; // Prevent double clicking
+        isProcessing = true;
+
+        const correctAnswer = qs[currentStep].getAttribute('data-answer');
+        
+        if (choice === correctAnswer) {
+            score++;
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+        }
+
+        // Wait 0.6 seconds so they can see the color, then move on
+        setTimeout(() => {
+            btn.classList.remove('correct', 'wrong');
+            qs[currentStep].classList.replace('active', 'hidden');
+            currentStep++;
+            document.getElementById('progress-bar').style.width = (currentStep / qs.length * 100) + '%';
+            
+            if (currentStep < qs.length) {
+                qs[currentStep].classList.replace('hidden', 'active');
+            } else { 
+                showResults(); 
+            }
+            isProcessing = false;
+        }, 600);
     }
 
     function showResults() {
@@ -137,7 +159,6 @@
             msg.innerHTML = "<p style='color:#2ecc71'>You're a real one! 🏆🏎️</p>";
             var duration = 3 * 1000;
             var end = Date.now() + duration;
-
             (function frame() {
               confetti({ particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#23a6d5', '#ffffff'] });
               confetti({ particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#23a6d5', '#ffffff'] });
