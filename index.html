@@ -3,151 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bestie Test: Leaderboard Edition 🏎️</title>
+    <title>Elite Racer: Bestie Telemetry 🏎️</title>
     <script src="https://jsdelivr.net"></script>
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.9) 100%), 
-                        url('https://unsplash.com');
-            background-size: cover; background-position: center; background-attachment: fixed;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #fff; overflow-x: hidden;
+        :root {
+            --accent: #00f2ff;
+            --danger: #ff0055;
+            --glass: rgba(10, 10, 12, 0.9);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        .quiz-container { 
-            background: rgba(15, 15, 15, 0.95); padding: 30px; border-radius: 20px; 
-            box-shadow: 0 0 30px rgba(35, 166, 213, 0.5); width: 90%; max-width: 400px; text-align: center; border: 1px solid #444;
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            /* Professional Dark Automotive Background */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
         }
 
+        /* Abstract Dynamic Background Elements */
+        .bg-line {
+            position: absolute; width: 2px; height: 100px;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            opacity: 0.2; animation: moveLine 4s linear infinite;
+        }
+        @keyframes moveLine { from { top: -100px; } to { top: 110vh; } }
+
+        .app-container {
+            width: 90%;
+            max-width: 440px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 2px; /* Sharp, modern edges */
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+        }
+
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .input-group { position: relative; margin-bottom: 20px; }
         input {
-            width: 80%; padding: 12px; margin: 15px 0; border-radius: 8px; border: none; font-size: 1em; text-align: center;
+            width: 100%; background: transparent; border: none;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 0; color: #fff; font-size: 1rem;
+            font-family: 'Syncopate', sans-serif; outline: none;
+            transition: 0.3s;
         }
+        input:focus { border-color: var(--accent); }
 
-        .leaderboard {
-            margin-top: 20px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: left;
+        /* Logic-driven Button Styles */
+        .btn-grid { display: grid; gap: 12px; margin-top: 20px; }
+        .racer-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            color: #ccc;
+            padding: 18px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
-
-        .leaderboard-entry {
-            display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding: 5px 0;
+        .racer-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: var(--accent); }
+        .racer-btn::after {
+            content: ''; position: absolute; left: 0; top: 0; height: 100%;
+            width: 3px; background: var(--accent); transform: scaleY(0); transition: 0.2s;
         }
+        .racer-btn:hover::after { transform: scaleY(1); }
 
-        .circle-wrap {
-            margin: 20px auto; width: 120px; height: 120px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; border: 8px solid #23a6d5;
+        /* Dynamic Feedback Classes */
+        .btn-correct { background: rgba(0, 242, 255, 0.2) !important; border-color: var(--accent) !important; color: #fff; }
+        .btn-wrong { background: rgba(255, 0, 85, 0.2) !important; border-color: var(--danger) !important; }
+
+        /* Speedometer Gauge */
+        .gauge {
+            width: 180px; height: 180px; border-radius: 50%;
+            margin: 0 auto 30px; border: 2px solid #222;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
         }
+        .gauge-label { font-family: 'Syncopate', sans-serif; font-size: 2rem; }
 
-        button { 
-            background: #23a6d5; color: white; border: none; padding: 14px; border-radius: 10px; 
-            cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; margin-top: 10px;
-        }
-
-        .hidden { display: none !important; }
-        .bg-emoji { position: absolute; animation: float 10s linear infinite; opacity: 0.5; z-index: -1; }
-        @keyframes float { 0% { transform: translateY(110vh); } 100% { transform: translateY(-10vh); } }
+        .hidden { display: none; }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="quiz-container">
-    <!-- NAME INPUT SCREEN -->
-    <div id="name-screen">
-        <h1>ENTRY FORM 📝</h1>
-        <p>Enter your racer name to start:</p>
-        <input type="text" id="player-name" placeholder="Your Name..." maxlength="15">
-        <button onclick="saveName()">Start Engine 🚀</button>
+    <div class="app-container" id="app">
+        <!-- Views will be injected here by Logic Controller -->
     </div>
 
-    <!-- QUIZ BOX (Keep your 20 questions here) -->
-    <div id="quiz-box" class="hidden">
-        <div class="question active" data-answer="D"><p>1. Favorite food? 🍕</p>
-            <button onclick="checkAnswer(this, 'A')">Pizza</button>
-            <button onclick="checkAnswer(this, 'B')">Burgers</button>
-            <button onclick="checkAnswer(this, 'C')">Sushi</button>
-            <button onclick="checkAnswer(this, 'D')">Shawarma</button>
-        </div>
-        <!-- ... Add your other 19 questions here ... -->
-    </div>
+    <script>
+        /** 
+         * LOGIC CONTROLLER: Elite Racer System
+         * Professional Data-Driven Quiz Architecture
+         */
+        const CONFIG = {
+            questions: [
+                { q: "PRIMARY FUEL SOURCE?", a: ["PIZZA", "BURGER", "SUSHI", "SHAWARMA"], c: 3 },
+                { q: "IDEAL TEST TRACK?", a: ["BEACH", "MOUNTAINS", "CITY", "NURBURGRING"], c: 3 },
+                { q: "SECONDARY SKILLSET?", a: ["SLEEPING", "SINGING", "GAMING", "TAX EVASION"], c: 0 },
+                { q: "SONIC PREFERENCE?", a: ["SHE GOES BY", "ROCK BABY", "BLUE", "DRIFT PHONK"], c: 0 },
+                { q: "COLD START CAPABILITY?", a: ["YES (MORNING)", "NO (NIGHT)"], c: 1 },
+                { q: "COMPANION TYPE?", a: ["CAT", "DOG"], c: 1 },
+                { q: "CARBONATED FLUID?", a: ["COKE", "PEPSI"], c: 0 },
+                { q: "CLIMATE PREFERENCE?", a: ["SUMMER", "WINTER"], c: 0 },
+                { q: "TRANSIT DESTINATION?", a: ["TOKYO", "SWITZERLAND"], c: 0 },
+                { q: "ENGINE DISPOSITION?", a: ["INTROVERT", "EXTROVERT"], c: 0 },
+                { q: "OPERATING SYSTEM?", a: ["IPHONE", "ANDROID"], c: 1 },
+                { q: "VISUAL MEDIA?", a: ["HORROR", "COMEDY"], c: 1 },
+                { q: "CORE VULNERABILITY?", a: ["NONE", "HEIGHTS"], c: 0 },
+                { q: "DESIRED UPGRADE?", a: ["FLIGHT", "INVISIBILITY"], c: 0 },
+                { q: "AESTHETIC TYPE?", a: ["SHORT/CUTE", "TALL/SAVORY"], c: 0 },
+                { q: "STIMULANT PREFERENCE?", a: ["COFFEE", "TEA"], c: 0 },
+                { q: "DYNAMIC MOVEMENT?", a: ["DANCING", "STATIONARY"], c: 1 },
+                { q: "WEATHER CONDITION?", a: ["RAINY", "SUNNY"], c: 0 },
+                { q: "PRODUCTION DATE?", a: ["JAN-JUN", "JUL-DEC"], c: 0 },
+                { q: "CHASSIS PREFERENCE?", a: ["AUDI", "BMW"], c: 1 }
+            ]
+        };
 
-    <!-- RESULT & LEADERBOARD -->
-    <div id="result-screen" class="hidden">
-        <h2>FINAL RANK 🏁</h2>
-        <div class="circle-wrap"><span id="score-val" style="font-size: 2em;">0</span></div>
-        
-        <div class="leaderboard">
-            <h3 style="text-align: center; margin-top: 0;">🏆 LEADERBOARD</h3>
-            <div id="leaderboard-list"></div>
-        </div>
-        <p style="font-size: 0.7em; margin-top: 15px; color: #888;">Data saved locally on this device.</p>
-    </div>
-</div>
+        const STATE = {
+            playerName: "",
+            currentIdx: 0,
+            score: 0,
+            isProcessing: false
+        };
 
-<script>
-    let playerName = "";
-    let score = 0;
-    let currentStep = 0;
-    const qs = document.querySelectorAll('.question');
+        const VIEW = {
+            app: document.getElementById('app'),
+            
+            init() {
+                this.renderNameScreen();
+                this.createBackground();
+            },
 
-    function saveName() {
-        const input = document.getElementById('player-name').value;
-        if (input.trim() === "") return alert("Enter a name, racer!");
-        playerName = input;
-        document.getElementById('name-screen').classList.add('hidden');
-        document.getElementById('quiz-box').classList.remove('hidden');
-    }
+            createBackground() {
+                for(let i=0; i<10; i++) {
+                    let l = document.createElement('div');
+                    l.className = 'bg-line';
+                    l.style.left = Math.random() * 100 + "vw";
+                    l.style.animationDelay = Math.random() * 4 + "s";
+                    document.body.appendChild(l);
+                }
+            },
 
-    function checkAnswer(btn, choice) {
-        const correct = qs[currentStep].getAttribute('data-answer');
-        if (choice === correct) {
-            score++;
-            btn.style.background = "#2ecc71";
-        } else {
-            btn.style.background = "#ff4757";
-        }
+            renderNameScreen() {
+                this.app.innerHTML = `
+                    <div class="fade-in">
+                        <h1>DRIVER AUTHENTICATION</h1>
+                        <div class="input-group">
+                            <input type="text" id="p-name" placeholder="ENTER RACER ID..." autocomplete="off">
+                        </div>
+                        <button class="racer-btn" onclick="CONTROLLER.startSession()">LAUNCH SYSTEM</button>
+                    </div>
+                `;
+            },
 
-        setTimeout(() => {
-            qs[currentStep].classList.replace('active', 'hidden');
-            currentStep++;
-            if (currentStep < qs.length) {
-                qs[currentStep].classList.replace('hidden', 'active');
-            } else { showResults(); }
-        }, 600);
-    }
+            renderQuestion() {
+                const data = CONFIG.questions[STATE.currentIdx];
+                let buttons = data.a.map((opt, i) => `
+                    <button class="racer-btn" onclick="CONTROLLER.handleAnswer(this, ${i})">
+                        ${i+1}. ${opt}
+                    </button>
+                `).join('');
 
-    function showResults() {
-        document.getElementById('quiz-box').classList.add('hidden');
-        document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('score-val').innerText = score + "/20";
+                this.app.innerHTML = `
+                    <div class="fade-in">
+                        <h1>TELEMETRY ${STATE.currentIdx + 1}/20</h1>
+                        <p style="margin-bottom: 25px; letter-spacing: 1px;">${data.q}</p>
+                        <div class="btn-grid">${buttons}</div>
+                    </div>
+                `;
+            },
 
-        // SAVE SCORE TO LOCAL STORAGE
-        let history = JSON.parse(localStorage.getItem('bestie_scores')) || [];
-        history.push({name: playerName, points: score});
-        history.sort((a, b) => b.points - a.points); // Sort highest first
-        localStorage.setItem('bestie_scores', JSON.stringify(history.slice(0, 5))); // Keep top 5
+            renderResults() {
+                const perc = (STATE.score / 20) * 100;
+                this.app.innerHTML = `
+                    <div class="fade-in">
+                        <h1>FINAL DATA REPORT</h1>
+                        <div class="gauge">
+                            <div class="gauge-label">${STATE.score}</div>
+                        </div>
+                        <p style="letter-spacing: 2px; font-size: 0.8rem;">PRECISION: ${perc}%</p>
+                        <div id="lb" style="margin-top: 30px; text-align: left; font-size: 0.7rem;"></div>
+                    </div>
+                `;
+                this.renderLeaderboard();
+            },
 
-        // DISPLAY LEADERBOARD
-        const list = document.getElementById('leaderboard-list');
-        history.slice(0, 5).forEach((entry, index) => {
-            list.innerHTML += `<div class="leaderboard-entry">
-                <span>${index + 1}. ${entry.name}</span>
-                <span>${entry.points}/20</span>
-            </div>`;
-        });
+            renderLeaderboard() {
+                const lb = JSON.parse(localStorage.getItem('pro_racer_lb') || '[]');
+                lb.push({ n: STATE.playerName, s: STATE.score });
+                lb.sort((a,b) => b.s - a.s);
+                localStorage.setItem('pro_racer_lb', JSON.stringify(lb.slice(0,5)));
 
-        if (score >= 15) confetti({ particleCount: 150, spread: 70 });
-    }
+                const container = document.getElementById('lb');
+                container.innerHTML = `<p style="color:var(--accent); border-bottom: 1px solid #333; padding-bottom: 5px;">TOP RANKED DRIVERS</p>` + 
+                    lb.slice(0,5).map((entry, i) => `
+                        <div style="display:flex; justify-content:space-between; padding: 8px 0; border-bottom: 1px solid #111;">
+                            <span>${i+1}. ${entry.n}</span>
+                            <span>${entry.s} PTS</span>
+                        </div>
+                    `).join('');
+            }
+        };
 
-    // Floating Emojis
-    setInterval(() => {
-        const e = document.createElement('div');
-        e.className = 'bg-emoji';
-        e.innerText = ['🏎️', '🏁', '🔥', '😊'][Math.floor(Math.random()*4)];
-        e.style.left = Math.random() * 100 + "vw";
-        document.body.appendChild(e);
-        setTimeout(() => e.remove(), 10000);
-    }, 1000);
-</script>
+        const CONTROLLER = {
+            startSession() {
+                const name = document.getElementById('p-name').value;
+                if(!name.trim()) return;
+                STATE.playerName = name.toUpperCase();
+                VIEW.renderQuestion();
+            },
+
+            handleAnswer(btn, idx) {
+                if(STATE.isProcessing) return;
+                STATE.isProcessing = true;
+
+                const correct = CONFIG.questions[STATE.currentIdx].c;
+                if(idx === correct) {
+                    STATE.score++;
+                    btn.classList.add('btn-correct');
+                } else {
+                    btn.classList.add('btn-wrong');
+                }
+
+                setTimeout(() => {
+                    STATE.currentIdx++;
+                    if(STATE.currentIdx < CONFIG.questions.length) {
+                        VIEW.renderQuestion();
+                    } else {
+                        VIEW.renderResults();
+                        if(STATE.score >= 15) confetti({ particleCount: 200, colors: ['#00f2ff', '#ffffff'] });
+                    }
+                    STATE.isProcessing = false;
+                }, 600);
+            }
+        };
+
+        VIEW.init();
+    </script>
 </body>
 </html>
-
-
-
