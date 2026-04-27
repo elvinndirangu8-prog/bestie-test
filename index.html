@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Racer: Global Telemetry 🏎️</title>
     
-    <!-- FIXED SCRIPTS -->
+    <!-- FIXED SCRIPTS: These must be exactly like this to load the system -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <script src="https://jsdelivr.net"></script>
@@ -33,7 +33,6 @@
     </div>
 
     <script>
-        // FIXED CONFIG: All URLs restored
         const firebaseConfig = {
             apiKey: "AIzaSyA6XwPIyCsapTe0kjdSvAepZ3ev1dK-DoI",
             authDomain: "bestie-quiz-a2daf.firebaseapp.com",
@@ -120,7 +119,8 @@
 
         function finalize() {
             localStorage.setItem("quiz_locked", "true");
-            db.ref('scores').push({ name: STATE.playerName, score: STATE.score });
+            // Upload to Firebase
+            db.ref('scores').push({ name: STATE.playerName, score: STATE.score }); 
             showFinalLeaderboard();
         }
 
