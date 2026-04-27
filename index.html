@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://flaticon.com">
-    <title> Bestie Test 🏎️</title>
+    <title>Bestie Test 🏎️</title>
 
     <script src="https://jsdelivr.net"></script>
     
     <style>
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+            background: radial-gradient(circle, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.9) 100%), 
                         url('https://unsplash.com');
             background-size: cover;
             background-position: center;
@@ -19,153 +19,159 @@
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; margin: 0; padding: 20px;
             color: #fff;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        .drifter {
-            font-size: 2em;
-            position: absolute;
-            top: 20px;
-            animation: drift 6s linear infinite;
+        /* FLOATING EMOJIS BACKGROUND */
+        .bg-emoji {
+            position: absolute; font-size: 1.5rem;
+            animation: float 10s linear infinite;
+            z-index: 1; opacity: 0.6;
         }
-        @keyframes drift {
-            0% { left: -100px; transform: scaleX(1); }
-            45% { transform: scaleX(1); }
-            50% { left: 110%; transform: scaleX(-1); }
-            95% { transform: scaleX(-1); }
-            100% { left: -100px; transform: scaleX(1); }
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
         }
 
         .quiz-container { 
             background: rgba(15, 15, 15, 0.95); 
-            padding: 30px; border-radius: 20px; 
-            box-shadow: 0 0 25px rgba(35, 166, 213, 0.6); 
+            padding: 40px; border-radius: 30px; 
+            box-shadow: 0 0 40px rgba(35, 166, 213, 0.4); 
             width: 100%; max-width: 450px; text-align: center; 
             border: 1px solid #444;
-            position: relative;
-            z-index: 10;
+            position: relative; z-index: 10;
+            transition: transform 0.3s;
         }
-        .progress-container { width: 100%; background: #333; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; display: none; }
-        #progress-bar { height: 100%; width: 0%; background: #23a6d5; transition: 0.3s; }
+
+        /* SHAKING BOX ANIMATION */
+        .question-box { animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        button { 
+            background: #23a6d5; color: white; border: none; padding: 16px; border-radius: 12px; 
+            cursor: pointer; margin: 10px 0; width: 100%; font-weight: bold; font-size: 1.1em; 
+            transition: all 0.3s; text-transform: uppercase;
+        }
+        button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(35, 166, 213, 0.4); }
+        button.correct { background: #2ecc71 !important; }
+        button.wrong { background: #ff4757 !important; animation: shake 0.3s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* CIRCULAR SCORE LOADER */
+        .circle-wrap {
+            margin: 20px auto; width: 150px; height: 150px;
+            background: #333; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; border: 8px solid #23a6d5;
+        }
+        #score-val { font-size: 2.5em; font-weight: 900; color: #23a6d5; }
+
         .hidden { display: none !important; }
         .active { display: block; }
-        
-        button { 
-            background: #23a6d5; color: white; border: none; padding: 14px; border-radius: 8px; 
-            cursor: pointer; margin: 8px 0; width: 100%; font-weight: bold; font-size: 1em; transition: 0.2s;
-            text-transform: uppercase;
-        }
-
-        /* NEW: Feedback Colors */
-        button.correct { background-color: #2ecc71 !important; transform: scale(1.05); }
-        button.wrong { background-color: #ff4757 !important; transform: shake 0.2s; }
-
-        h1 { color: #23a6d5; margin-bottom: 10px; }
-        #result { font-size: 1.5em; font-weight: 600; color: #2ecc71; }
     </style>
 </head>
 <body>
 
-<div class="drifter">🏎️💨</div>
+<!-- BACKGROUND ANIMATION SCRIPT WILL ADD EMOJIS HERE -->
 
-<div class="quiz-container">
+<div class="quiz-container" id="main-container">
     <div id="intro-screen">
         <h1>DO U KNOW ME?? 🏎️💨</h1>
-        <p>20 Questions to see if you're a real co-driver! 🏁</p>
-        <button onclick="startQuiz()">Start Engine 🚀</button>
-    </div>
-
-    <div class="progress-container" id="p-container">
-        <div id="progress-bar"></div>
+        <p>You only get one tank of gas! No retries. ⛽</p>
+        <button onclick="startQuiz()">Ignition 🚀</button>
     </div>
 
     <div id="quiz-box" class="hidden">
+        <!-- ALL QUESTIONS WRAPPED IN ANIMATED DIVS -->
         <div class="question active" data-answer="D"><p>1. Favorite food? 🍕</p><button onclick="checkAnswer(this, 'A')">Pizza 🍕</button><button onclick="checkAnswer(this, 'B')">Burgers 🍔</button><button onclick="checkAnswer(this, 'C')">Sushi 🍣</button><button onclick="checkAnswer(this, 'D')">Shawarma 🌯</button></div>
-        <div class="question hidden" data-answer="B"><p>2. Dream travel? ✈️</p><button onclick="checkAnswer(this, 'A')">Beach 🏖️</button><button onclick="checkAnswer(this, 'B')">Mountains 🏔️</button><button onclick="checkAnswer(this, 'C')">City 🏙️</button><button onclick="checkAnswer(this, 'D')">Race Track 🏁</button></div>
-        <div class="question hidden" data-answer="A"><p>3. Secret talent? 🎭</p><button onclick="checkAnswer(this, 'A')">Sleeping 😴</button><button onclick="checkAnswer(this, 'B')">Singing 🎤</button><button onclick="checkAnswer(this, 'C')">Gaming 🎮</button><button onclick="checkAnswer(this, 'D')">Debts 😹💸</button></div>
-        <div class="question hidden" data-answer="A"><p>4. Fav song? 🎶</p><button onclick="checkAnswer(this, 'A')">She Goes By 🎵</button><button onclick="checkAnswer(this, 'B')">Rock Baby 🎸</button><button onclick="checkAnswer(this, 'C')">Blue 💙</button><button onclick="checkAnswer(this, 'D')">Other ❓</button></div>
-        <div class="question hidden" data-answer="B"><p>5. Am I a morning person? ☀️</p><button onclick="checkAnswer(this, 'A')">Yes 🌅</button><button onclick="checkAnswer(this, 'B')">No 😴</button></div>
-        <div class="question hidden" data-answer="B"><p>6. Cats or Dogs? 🐾</p><button onclick="checkAnswer(this, 'A')">Cats 🐱</button><button onclick="checkAnswer(this, 'B')">Dogs 🐶</button></div>
-        <div class="question hidden" data-answer="A"><p>7. Coke or Pepsi? 🥤</p><button onclick="checkAnswer(this, 'A')">Coke ❤️</button><button onclick="checkAnswer(this, 'B')">Pepsi 💙</button></div>
-        <div class="question hidden" data-answer="A"><p>8. Favorite season? 🍂</p><button onclick="checkAnswer(this, 'A')">Summer ☀️</button><button onclick="checkAnswer(this, 'B')">Winter ❄️</button></div>
-        <div class="question hidden" data-answer="A"><p>9. Where would I travel? 🌍</p><button onclick="checkAnswer(this, 'A')">Tokyo 🗼</button><button onclick="checkAnswer(this, 'B')">Switzerland 🇨🇭</button></div>
-        <div class="question hidden" data-answer="A"><p>10. Introvert or Extrovert? 👥</p><button onclick="checkAnswer(this, 'A')">Introvert 🏠</button><button onclick="checkAnswer(this, 'B')">Extrovert 🥳</button></div>
-        <div class="question hidden" data-answer="B"><p>11. Android or iPhone? 📱</p><button onclick="checkAnswer(this, 'A')">iPhone 🍎</button><button onclick="checkAnswer(this, 'B')">Android 🤖</button></div>
-        <div class="question hidden" data-answer="B"><p>12. Movie genre? 🍿</p><button onclick="checkAnswer(this, 'A')">Horror 👻</button><button onclick="checkAnswer(this, 'B')">Comedy 😂</button></div>
-        <div class="question hidden" data-answer="A"><p>13. My biggest fear? 😱</p><button onclick="checkAnswer(this, 'A')">None 😎</button><button onclick="checkAnswer(this, 'B')">Heights 🧗</button></div>
-        <div class="question hidden" data-answer="A"><p>14. Best superpower? ⚡</p><button onclick="checkAnswer(this, 'A')">Flight 🦅</button><button onclick="checkAnswer(this, 'B')">Invisibility 👻</button></div>
-        <div class="question hidden" data-answer="A"><p>15. TYPE?? 😍</p><button onclick="checkAnswer(this, 'A')">short and cute ✨</button><button onclick="checkAnswer(this, 'B')">tall and Savory 🔥</button></div>
-        <div class="question hidden" data-answer="B"><p>16. Tea or Coffee? ☕</p><button onclick="checkAnswer(this, 'A')">Coffee ☕</button><button onclick="checkAnswer(this, 'B')">Tea 🍵</button></div>
-        <div class="question hidden" data-answer="B"><p>17. Do I like dancing? 💃</p><button onclick="checkAnswer(this, 'A')">Yes 🕺</button><button onclick="checkAnswer(this, 'B')">No 🙅‍♂️</button></div>
-        <div class="question hidden" data-answer="A"><p>18. Rainy days or Sunny days? 🌧️</p><button onclick="checkAnswer(this, 'A')">Rainy ☔</button><button onclick="checkAnswer(this, 'B')">Sunny 🕶️</button></div>
-        <div class="question hidden" data-answer="A"><p>19. My birth month? 🎂</p><button onclick="checkAnswer(this, 'A')">Jan-Jun 🌱</button><button onclick="checkAnswer(this, 'B')">Jul-Dec 🍂</button></div>
+        <!-- (Rest of your 20 questions stay the same, but add checkAnswer(this, 'X')) -->
+        <!-- ... [I've truncated the questions for space, keep your 20 here] ... -->
         <div class="question hidden" data-answer="B"><p>20. FAV CAR 🚗</p><button onclick="checkAnswer(this, 'A')">AUDI ⚪</button><button onclick="checkAnswer(this, 'B')">BMW 🔵</button></div>
     </div>
 
     <div id="result" class="hidden">
-        <p>Score: <span id="score-val">0</span> / 20</p>
+        <h2>MISSION COMPLETE 🏁</h2>
+        <div class="circle-wrap">
+            <span id="score-val">0</span>
+        </div>
         <div id="message"></div>
-        <button onclick="location.reload()" style="background:#ff4757; margin-top: 20px;">Refuel & Restart 🔄</button>
+        <p style="font-size: 0.8em; color: #888;">Entry Locked: Retries Disabled 🔒</p>
     </div>
 </div>
 
 <script>
+    // 1. NO REPEAT LOGIC
+    if (localStorage.getItem("quiz_done")) {
+        window.onload = () => {
+            document.body.innerHTML = "<h1 style='color:white; text-align:center; padding-top:20%;'>🚫 ONE ENTRY ONLY! <br> You've already used your gas!</h1>";
+        };
+    }
+
+    // 2. CREATE FLOATING EMOJIS
+    const emojis = ['🏎️', '🏎️💨', '😊', '🔥', '🏁', '⚡', '🚦'];
+    for (let i = 0; i < 15; i++) {
+        let e = document.createElement('div');
+        e.className = 'bg-emoji';
+        e.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        e.style.left = Math.random() * 100 + "vw";
+        e.style.animationDuration = (Math.random() * 5 + 5) + "s";
+        e.style.animationDelay = Math.random() * 5 + "s";
+        document.body.appendChild(e);
+    }
+
     let currentStep = 0, score = 0, isProcessing = false;
     const qs = document.querySelectorAll('.question');
 
     function startQuiz() {
         document.getElementById('intro-screen').classList.add('hidden');
         document.getElementById('quiz-box').classList.remove('hidden');
-        document.getElementById('p-container').style.display = 'block';
     }
 
     function checkAnswer(btn, choice) {
-        if (isProcessing) return; // Prevent double clicking
+        if (isProcessing) return;
         isProcessing = true;
-
-        const correctAnswer = qs[currentStep].getAttribute('data-answer');
+        const correct = qs[currentStep].getAttribute('data-answer');
         
-        if (choice === correctAnswer) {
+        if (choice === correct) {
             score++;
             btn.classList.add('correct');
         } else {
             btn.classList.add('wrong');
         }
 
-        // Wait 0.6 seconds so they can see the color, then move on
         setTimeout(() => {
-            btn.classList.remove('correct', 'wrong');
             qs[currentStep].classList.replace('active', 'hidden');
             currentStep++;
-            document.getElementById('progress-bar').style.width = (currentStep / qs.length * 100) + '%';
-            
             if (currentStep < qs.length) {
                 qs[currentStep].classList.replace('hidden', 'active');
-            } else { 
-                showResults(); 
-            }
+            } else { showResults(); }
             isProcessing = false;
         }, 600);
     }
 
     function showResults() {
+        localStorage.setItem("quiz_done", "true"); // LOCK THE QUIZ
         document.getElementById('quiz-box').classList.add('hidden');
-        document.getElementById('p-container').classList.add('hidden');
         document.getElementById('result').classList.remove('hidden');
-        document.getElementById('score-val').innerText = score;
-        let msg = document.getElementById('message');
         
+        // Animated Score Loader
+        let currentDisplay = 0;
+        let timer = setInterval(() => {
+            if (currentDisplay >= score) clearInterval(timer);
+            document.getElementById('score-val').innerText = currentDisplay + "/20";
+            currentDisplay++;
+        }, 50);
+
         if (score >= 15) {
-            msg.innerHTML = "<p style='color:#2ecc71'>You're a real one! 🏆🏎️</p>";
-            var duration = 3 * 1000;
-            var end = Date.now() + duration;
-            (function frame() {
-              confetti({ particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#23a6d5', '#ffffff'] });
-              confetti({ particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#23a6d5', '#ffffff'] });
-              if (Date.now() < end) { requestAnimationFrame(frame); }
-            }());
+            confetti({ particleCount: 200, spread: 90 });
+            document.getElementById('message').innerHTML = "LEGENDARY DRIVER! 🏆";
         } else {
-            msg.innerHTML = "<p style='color:#ff4757'>You ran out of gas! 💀⛽</p>";
+            document.getElementById('message').innerHTML = "BACK TO DRIVING SCHOOL! 💀";
         }
     }
 </script>
